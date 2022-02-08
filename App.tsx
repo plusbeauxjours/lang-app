@@ -1,5 +1,42 @@
-import React from "react";
+import React, { useState, useRef } from "react";
+import { Animated, Easing } from "react-native";
+import styled from "styled-components/native";
+
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Box = styled.TouchableOpacity`
+  background-color: tomato;
+  width: 200px;
+  height: 200px;
+`;
+
+const AnimatedBox = Animated.createAnimatedComponent(Box);
 
 export default function App() {
-  return null;
+  const [up, setUp] = useState(false);
+  const Y = useRef(new Animated.Value(0)).current;
+  const toggleUp = () => setUp((prev) => !prev);
+
+  const moveUp = () => {
+    Animated.timing(Y, {
+      toValue: up ? 200 : -200,
+      useNativeDriver: true,
+      easing: Easing.circle,
+    }).start(toggleUp);
+  };
+
+  return (
+    <Container>
+      <AnimatedBox
+        onPress={moveUp}
+        style={{
+          transform: [{ translateY: Y }],
+        }}
+      />
+    </Container>
+  );
 }
