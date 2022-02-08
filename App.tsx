@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useEffect } from "react";
-import { Animated, Dimensions, Pressable } from "react-native";
+import { Animated, Dimensions, PanResponder, Pressable } from "react-native";
 import styled from "styled-components/native";
 
 const Container = styled.View`
@@ -9,7 +8,7 @@ const Container = styled.View`
   align-items: center;
 `;
 
-const Box = styled.TouchableOpacity`
+const Box = styled.View`
   background-color: tomato;
   width: 200px;
   height: 200px;
@@ -25,8 +24,10 @@ export default function App() {
 
   const POSITION = useRef(
     new Animated.ValueXY({
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
+      // x: -SCREEN_WIDTH / 2 + 100,
+      // y: -SCREEN_HEIGHT / 2 + 100,
+      x: 0,
+      y: 0,
     })
   ).current;
 
@@ -60,46 +61,68 @@ export default function App() {
     outputRange: ["rgb(255, 99, 71)", "rgb(71, 166, 255)"],
   });
 
-  const topLeft = Animated.timing(POSITION, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    useNativeDriver: false,
-  });
+  // const topLeft = Animated.timing(POSITION, {
+  //   toValue: {
+  //     x: -SCREEN_WIDTH / 2 + 100,
+  //     y: -SCREEN_HEIGHT / 2 + 100,
+  //   },
+  //   useNativeDriver: false,
+  // });
 
-  const bottomLeft = Animated.timing(POSITION, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: SCREEN_HEIGHT / 2 - 100,
-    },
-    useNativeDriver: false,
-  });
+  // const bottomLeft = Animated.timing(POSITION, {
+  //   toValue: {
+  //     x: -SCREEN_WIDTH / 2 + 100,
+  //     y: SCREEN_HEIGHT / 2 - 100,
+  //   },
+  //   useNativeDriver: false,
+  // });
 
-  const bottomRight = Animated.timing(POSITION, {
-    toValue: {
-      x: SCREEN_WIDTH / 2 - 100,
-      y: SCREEN_HEIGHT / 2 - 100,
-    },
-    useNativeDriver: false,
-  });
+  // const bottomRight = Animated.timing(POSITION, {
+  //   toValue: {
+  //     x: SCREEN_WIDTH / 2 - 100,
+  //     y: SCREEN_HEIGHT / 2 - 100,
+  //   },
+  //   useNativeDriver: false,
+  // });
 
-  const topRight = Animated.timing(POSITION, {
-    toValue: {
-      x: SCREEN_WIDTH / 2 - 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    useNativeDriver: false,
-  });
+  // const topRight = Animated.timing(POSITION, {
+  //   toValue: {
+  //     x: SCREEN_WIDTH / 2 - 100,
+  //     y: -SCREEN_HEIGHT / 2 + 100,
+  //   },
+  //   useNativeDriver: false,
+  // });
 
-  const moveUp = () =>
-    Animated.loop(
-      Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
-    ).start();
+  // const moveUp = () =>
+  //   Animated.loop(
+  //     Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
+  //   ).start();
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, { dx, dy }) => {
+        POSITION.setValue({
+          x: dx,
+          y: dy,
+        });
+      },
+      onPanResponderRelease: () => {
+        Animated.spring(POSITION, {
+          toValue: {
+            x: 0,
+            y: 0,
+          },
+          bounciness: 20,
+          useNativeDriver: false,
+        }).start();
+      },
+    })
+  ).current;
 
   return (
     <Container>
-      <Pressable onPress={moveUp}>
+      {/* <Pressable onPress={moveUp}>
         <AnimatedBox
           onPress={moveUp}
           style={{
@@ -115,7 +138,15 @@ export default function App() {
             transform: [...POSITION.getTranslateTransform()],
           }}
         />
-      </Pressable>
+      </Pressable> */}
+      <AnimatedBox
+        {...panResponder.panHandlers}
+        style={{
+          borderRadius,
+          backgroundColor: bgColor,
+          transform: POSITION.getTranslateTransform(),
+        }}
+      />
     </Container>
   );
 }
