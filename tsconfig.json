@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    /* Additional Options 0315*/
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "importHelpers": true,
+    "noUnusedLocals": false,
+
+    /* Basic Options */
+    "allowJs": true,
+    "target": "ESNext",
+    "module": "CommonJS",
+    "lib": ["ES6", "es2019"],
+    "jsx": "react-native",
+    // "isolatedModules": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "alwaysStrict": true,
+
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*", "App.tsx", "styled.ts", "styled-components.d.ts"],
+  "exclude": [
+    "typings",
+    "**/__generated__/**",
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "react-native.config.js"
+  ]
+}
