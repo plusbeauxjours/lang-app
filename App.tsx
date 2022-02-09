@@ -21,46 +21,69 @@ const Card = styled(Animated.createAnimatedComponent(View))`
 `;
 
 export default function App() {
+  // Values
+  const scale = useRef(new Animated.Value(1)).current;
+  const position = useRef(new Animated.Value(0)).current;
+  const rotation = position.interpolate({
+    inputRange: [-250, 250],
+    outputRange: ["-15deg", "15deg"],
+  });
+
+  // Animations
+  const onPressIn = Animated.spring(scale, {
+    toValue: 0.95,
+    useNativeDriver: true,
+  });
+  const onPressOut = Animated.spring(scale, {
+    toValue: 1,
+    useNativeDriver: true,
+  });
+  const goCenter = Animated.spring(position, {
+    toValue: 0,
+    useNativeDriver: true,
+  });
+
+  // Pan Responders
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, { dx }) => {
-        position.setValue(dx);
+      onPanResponderGrant: () => {
+        onPressIn.start();
       },
-      onPanResponderGrant: () => onPressIn(),
-      onPanResponderRelease: () => {
-        Animated.parallel([
-          onPressOut(),
+      onPanResponderMove: (_, { dx }) => {
+        position.setValue(dx); // 카드의 위치 x를 계속해서 position변수에 set해준다.
+      },
+      onPanResponderRelease: (_, { dx }) => {
+        if (dx < -320) {
+          // 카드의 위치 x가 limit를 벗어날 경우
           Animated.spring(position, {
-            toValue: 0,
+            toValue: -500,
             useNativeDriver: true,
-          }),
-        ]).start();
+          }).start();
+        } else if (dx > 320) {
+          // 카드의 위치 x가 limit를 벗어날 경우
+          Animated.spring(position, {
+            toValue: 500,
+            useNativeDriver: true,
+          }).start();
+        } else {
+          // 카드의 스케일과 위치를 원상태로 돌아오게 한다.
+          Animated.parallel([goCenter, onPressOut]).start();
+        }
       },
     })
   ).current;
-
-  const scale = useRef(new Animated.Value(1)).current;
-  const position = useRef(new Animated.Value(0)).current;
-
-  const onPressIn = () =>
-    Animated.spring(scale, {
-      toValue: 0.95,
-      useNativeDriver: true,
-    }).start();
-
-  const onPressOut = () =>
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-    });
 
   return (
     <Container>
       <Card
         {...panResponder.panHandlers}
         style={{
-          transform: [{ scale }, { translateX: position }],
+          transform: [
+            { scale }, // 계속해서 바뀌는 카드 scale을 style에 적용시킨다.
+            { translateX: position }, // 계속해서 바뀌는 카드의 위치 x를 style에 적용시킨다.
+            { rotateZ: rotation },
+          ],
         }}
       >
         <Ionicons name="pizza" color="#192a56" size={98} />
