@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Animated, PanResponder, View } from "react-native";
+import { Animated, Dimensions, PanResponder, View } from "react-native";
 import styled from "styled-components/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -19,6 +19,8 @@ const Card = styled(Animated.createAnimatedComponent(View))`
   border-radius: 12px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 `;
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function App() {
   // Values
@@ -54,14 +56,14 @@ export default function App() {
         position.setValue(dx); // 카드의 위치 x를 계속해서 position변수에 set해준다.
       },
       onPanResponderRelease: (_, { dx }) => {
-        if (dx < -320) {
-          // 카드의 위치 x가 limit를 벗어날 경우
+        if (dx < -SCREEN_WIDTH + 100) {
+          // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
           Animated.spring(position, {
             toValue: -500,
             useNativeDriver: true,
           }).start();
-        } else if (dx > 320) {
-          // 카드의 위치 x가 limit를 벗어날 경우
+        } else if (dx > SCREEN_WIDTH - 100) {
+          // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
           Animated.spring(position, {
             toValue: 500,
             useNativeDriver: true,
