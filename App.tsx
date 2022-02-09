@@ -1,7 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Animated, Dimensions, PanResponder, View } from "react-native";
 import styled from "styled-components/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import icons from "./icons";
 
 const Container = styled.View`
   flex: 1;
@@ -39,6 +40,13 @@ const CardContainer = styled.View`
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function App() {
+  const [index, setIndex] = useState(0);
+  const onDismiss = () => {
+    scale.setValue(1);
+    position.setValue(0);
+    setIndex((prev) => prev + 1);
+  };
+
   // Values
   const scale = useRef(new Animated.Value(1)).current;
   const position = useRef(new Animated.Value(0)).current;
@@ -66,12 +74,12 @@ export default function App() {
     useNativeDriver: true,
   });
   const goLeft = Animated.spring(position, {
-    toValue: -500,
+    toValue: -200,
     tension: 5,
     useNativeDriver: true,
   });
   const goRight = Animated.spring(position, {
-    toValue: 500,
+    toValue: 200,
     tension: 5,
     useNativeDriver: true,
   });
@@ -89,10 +97,12 @@ export default function App() {
       onPanResponderRelease: (_, { dx }) => {
         if (dx < -SCREEN_WIDTH + 100) {
           // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
-          goLeft.start();
+          // goLeft라는 Animated.spring()을 .start로 실행시키고, .start의 option으로 onDissmiss를 준다.
+          goLeft.start(onDismiss);
         } else if (dx > SCREEN_WIDTH - 100) {
           // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
-          goRight.start();
+          // goRight Animated.spring()을 .start로 실행시키고, .start의 option으로 onDissmiss를 준다.
+          goRight.start(onDismiss);
         } else {
           // 카드의 스케일과 위치를 원상태로 돌아오게 한다.
           Animated.parallel([goCenter, onPressOut]).start();
@@ -102,10 +112,12 @@ export default function App() {
   ).current;
 
   const closePress = () => {
-    goLeft.start();
+    // goLeft라는 Animated.spring()을 .start로 실행시키고, .start의 option으로 onDissmiss를 준다.
+    goLeft.start(onDismiss);
   };
   const checkPress = () => {
-    goRight.start();
+    // goRight Animated.spring()을 .start로 실행시키고, .start의 option으로 onDissmiss를 준다.
+    goRight.start(onDismiss);
   };
 
   return (
@@ -120,7 +132,7 @@ export default function App() {
             ],
           }}
         >
-          <Ionicons name="beer" color="#192a56" size={98} />
+          <Ionicons name={icons[index + 1]} color="#192a56" size={98} />
         </Card>
         <Card
           {...panResponder.panHandlers}
@@ -132,7 +144,7 @@ export default function App() {
             ],
           }}
         >
-          <Ionicons name="pizza" color="#192a56" size={98} />
+          <Ionicons name={icons[index]} color="#192a56" size={98} />
         </Card>
       </CardContainer>
       <BtnContainer>
