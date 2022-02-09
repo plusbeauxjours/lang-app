@@ -18,6 +18,22 @@ const Card = styled(Animated.createAnimatedComponent(View))`
   align-items: center;
   border-radius: 12px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+`;
+
+const Btn = styled.TouchableOpacity`
+  margin: 0px 10px;
+`;
+
+const BtnContainer = styled.View`
+  flex-direction: row;
+  flex: 1;
+`;
+
+const CardContainer = styled.View`
+  flex: 3;
+  justify-content: center;
+  align-items: center;
 `;
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -29,6 +45,11 @@ export default function App() {
   const rotation = position.interpolate({
     inputRange: [-250, 250],
     outputRange: ["-15deg", "15deg"],
+  });
+  const secondScale = position.interpolate({
+    inputRange: [-300, 0, 300],
+    outputRange: [1, 0.7, 1],
+    extrapolate: "clamp",
   });
 
   // Animations
@@ -42,6 +63,16 @@ export default function App() {
   });
   const goCenter = Animated.spring(position, {
     toValue: 0,
+    useNativeDriver: true,
+  });
+  const goLeft = Animated.spring(position, {
+    toValue: -500,
+    tension: 5,
+    useNativeDriver: true,
+  });
+  const goRight = Animated.spring(position, {
+    toValue: 500,
+    tension: 5,
     useNativeDriver: true,
   });
 
@@ -58,16 +89,10 @@ export default function App() {
       onPanResponderRelease: (_, { dx }) => {
         if (dx < -SCREEN_WIDTH + 100) {
           // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
-          Animated.spring(position, {
-            toValue: -500,
-            useNativeDriver: true,
-          }).start();
+          goLeft.start();
         } else if (dx > SCREEN_WIDTH - 100) {
           // 카드의 위치 x가 limit를 벗어날 경우 실행되어 다음 카드를 보여주고 touch finished가 된다
-          Animated.spring(position, {
-            toValue: 500,
-            useNativeDriver: true,
-          }).start();
+          goRight.start();
         } else {
           // 카드의 스케일과 위치를 원상태로 돌아오게 한다.
           Animated.parallel([goCenter, onPressOut]).start();
@@ -76,20 +101,48 @@ export default function App() {
     })
   ).current;
 
+  const closePress = () => {
+    goLeft.start();
+  };
+  const checkPress = () => {
+    goRight.start();
+  };
+
   return (
     <Container>
-      <Card
-        {...panResponder.panHandlers}
-        style={{
-          transform: [
-            { scale }, // 계속해서 바뀌는 카드 scale을 style에 적용시킨다.
-            { translateX: position }, // 계속해서 바뀌는 카드의 위치 x를 style에 적용시킨다.
-            { rotateZ: rotation },
-          ],
-        }}
-      >
-        <Ionicons name="pizza" color="#192a56" size={98} />
-      </Card>
+      <CardContainer>
+        <Card
+          style={{
+            transform: [
+              {
+                scale: secondScale, // 뒷장에 있는 카드의 scale
+              },
+            ],
+          }}
+        >
+          <Ionicons name="beer" color="#192a56" size={98} />
+        </Card>
+        <Card
+          {...panResponder.panHandlers}
+          style={{
+            transform: [
+              { scale }, // 계속해서 바뀌는 카드 scale을 style에 적용시킨다.
+              { translateX: position }, // 계속해서 바뀌는 카드의 위치 x를 style에 적용시킨다.
+              { rotateZ: rotation },
+            ],
+          }}
+        >
+          <Ionicons name="pizza" color="#192a56" size={98} />
+        </Card>
+      </CardContainer>
+      <BtnContainer>
+        <Btn onPress={closePress}>
+          <Ionicons name="close-circle" color="white" size={58} />
+        </Btn>
+        <Btn onPress={checkPress}>
+          <Ionicons name="checkmark-circle" color="white" size={58} />
+        </Btn>
+      </BtnContainer>
     </Container>
   );
 }
