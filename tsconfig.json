@@ -31,7 +31,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "App.tsx", "styled.ts", "styled-components.d.ts"],
+  "include": ["src/**/*", "AppTest.tsx", "styled.ts"],
   "exclude": [
     "typings",
     "**/__generated__/**",

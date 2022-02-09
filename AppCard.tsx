@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
 import { Animated, Dimensions, PanResponder, View } from "react-native";
+
 import styled from "styled-components/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+
 import icons from "./icons";
 
 const Container = styled.View`
@@ -39,14 +41,7 @@ const CardContainer = styled.View`
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-export default function App() {
-  const [index, setIndex] = useState(0);
-  const onDismiss = () => {
-    scale.setValue(1);
-    setIndex((prev) => prev + 1);
-    position.setValue(0);
-  };
-
+export default function AppCard() {
   // Values
   const scale = useRef(new Animated.Value(1)).current;
   const position = useRef(new Animated.Value(0)).current;
@@ -114,6 +109,14 @@ export default function App() {
       },
     })
   ).current;
+
+  // State
+  const [index, setIndex] = useState(0);
+  const onDismiss = () => {
+    scale.setValue(1);
+    setIndex((prev) => prev + 1);
+    position.setValue(0);
+  };
 
   const closePress = () => {
     // goLeft라는 Animated.spring()을 .start로 실행시키고, .start의 option으로 onDissmiss를 준다.
